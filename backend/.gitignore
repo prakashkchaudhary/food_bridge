@@ -1,27 +1,35 @@
 # Dependencies
 node_modules/
 
-# Environment variables
+# Environment variables — NEVER commit these
 .env
 .env.local
 .env.production
+.env.*.local
 
 # Logs
+logs/
 *.log
 npm-debug.log*
-logs/
+yarn-debug.log*
+yarn-error.log*
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Testing
+# Build / temp
+dist/
+build/
 coverage/
-
-# Temporary files
 *.tmp
-mongo-playground.js
+
+# mongodb-memory-server binary cache
+.cache/

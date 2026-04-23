@@ -45,6 +45,12 @@ restructure.ps1
 # MongoDB
 data/
 
+# MongoDB local scratch files
+backend/mongo-playground.js
+
+# mongodb-memory-server binary cache
+backend/.cache/
+
 # Testing
 coverage/
 .nyc_output/
