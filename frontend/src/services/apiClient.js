@@ -1,9 +1,13 @@
 import axios from 'axios'
 
+// Production backend URL — hardcoded as fallback so it always works on Vercel
+const PRODUCTION_API_URL = 'https://food-bridge-6-zn3t.onrender.com/api'
+
 function resolveApiBaseUrl() {
   const envUrl = import.meta.env.VITE_API_BASE_URL
-  const fallback = 'http://localhost:5000/api'
-  const raw = envUrl && envUrl.trim() ? envUrl.trim() : fallback
+
+  // Use env var if explicitly set, otherwise use production URL
+  const raw = envUrl && envUrl.trim() ? envUrl.trim() : PRODUCTION_API_URL
 
   if (typeof window === 'undefined') return raw
 
