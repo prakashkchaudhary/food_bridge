@@ -11,7 +11,9 @@ const adminRoutes = require("./routes/adminRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 // Load .env only in development (Render injects env vars directly in production)
-dotenv.config();
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
 
 const app = express();
 
@@ -39,14 +41,14 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Render sets PORT automatically — always use process.env.PORT
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT, 10) || 5000;
 
 async function startServer() {
   try {
     await connectDB();
-    // Bind to 0.0.0.0 so Render can detect the open port
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
+      console.log(`PORT env value: ${process.env.PORT}`);
     });
   } catch (error) {
     console.error("Server startup failed:", error.message);
