@@ -11,15 +11,37 @@ const adminRoutes = require("./routes/adminRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 // Load .env only in development (Render injects env vars directly in production)
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config();
-}
+dotenv.config();
 
 const app = express();
 
 // Use 'combined' log format in production for structured logs, 'dev' locally
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
-app.use(cors());
+
+// CORS — allow frontend origin in production, all origins in development
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+  process.env.FRONTEND_URL,        // set this in Render env vars
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        process.env.NODE_ENV !== "production"
+      ) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS: origin not allowed"));
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 // Root health check — required by Render and load balancers
