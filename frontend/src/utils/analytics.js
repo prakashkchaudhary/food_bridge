@@ -3,7 +3,7 @@
  * Tracks page views and custom events throughout the app
  */
 
-const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'REPLACE_WITH_YOUR_GA_ID'
+const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-GS5R7KH9JT'
 
 /**
  * Send a page view event to GA4
