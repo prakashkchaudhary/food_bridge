@@ -23,6 +23,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
   "https://food-bridge-frontend-zeta.vercel.app",
+  "https://food-bridge-app-zeta.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
