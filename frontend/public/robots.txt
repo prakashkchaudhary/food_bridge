@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://food-bridge-app-zeta.vercel.app/sitemap.xml
+
+# Block private routes from indexing
+Disallow: /admin
+Disallow: /donor
+Disallow: /ngo
