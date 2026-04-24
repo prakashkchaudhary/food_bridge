@@ -22,7 +22,8 @@ app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
-  process.env.FRONTEND_URL,        // set this in Render env vars
+  "https://food-bridge-frontend-zeta.vercel.app",
+  process.env.FRONTEND_URL,
 ].filter(Boolean);
 
 app.use(
