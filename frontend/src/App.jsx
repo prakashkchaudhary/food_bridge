@@ -1,8 +1,10 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ROLES } from './utils/constants'
+import { trackPageView } from './utils/analytics'
 import AdminDashboard from './pages/AdminDashboard'
 import DonateFood from './pages/DonateFood'
 import DonorDashboard from './pages/DonorDashboard'
@@ -15,6 +17,13 @@ import Register from './pages/Register'
  * Application shell + route map (role-gated dashboards).
  */
 export default function App() {
+  const location = useLocation()
+
+  // Track page view on every route change
+  useEffect(() => {
+    trackPageView(location.pathname + location.search)
+  }, [location])
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
