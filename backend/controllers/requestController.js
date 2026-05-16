@@ -20,6 +20,13 @@ const createRequest = async (req, res, next) => {
       throw new Error("Food item is not available for request");
     }
 
+    // Validate food has not expired
+    if (new Date(food.expiry) < new Date()) {
+      res.status(400);
+      throw new Error("This food item has expired and cannot be requested");
+    }
+
+    // Check if this NGO already requested this food
     const existing = await Request.findOne({
       food: food._id,
       ngo: req.user._id,
@@ -28,6 +35,16 @@ const createRequest = async (req, res, next) => {
     if (existing) {
       res.status(409);
       throw new Error("You already requested this food");
+    }
+
+    // Prevent race condition: Check if ANY NGO has already requested this food
+    const anyExistingRequest = await Request.findOne({
+      food: food._id,
+      status: { $in: ["pending", "accepted"] },
+    });
+    if (anyExistingRequest) {
+      res.status(409);
+      throw new Error("This food item has already been requested by another NGO");
     }
 
     const request = await Request.create({

@@ -18,6 +18,16 @@ const addFood = async (req, res, next) => {
       throw new Error("name, quantity, location.lat, location.lng and expiry are required");
     }
 
+    // Validate expiry date is not in the past
+    const expiryDate = new Date(expiry);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Reset time to start of day for fair comparison
+    
+    if (expiryDate < now) {
+      res.status(400);
+      throw new Error("Expiry date cannot be in the past");
+    }
+
     const food = await Food.create({
       name,
       quantity,

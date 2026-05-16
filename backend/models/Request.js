@@ -21,4 +21,9 @@ const requestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Add indexes for better query performance
+requestSchema.index({ food: 1, status: 1 });
+requestSchema.index({ ngo: 1, status: 1 });
+requestSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model("Request", requestSchema);

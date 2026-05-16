@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: 8,
     },
     role: {
       type: String,
@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Add index for better query performance
+userSchema.index({ email: 1 });
+userSchema.index({ role: 1 });
 
 userSchema.pre("save", async function hashPassword() {
   if (!this.isModified("password")) return;

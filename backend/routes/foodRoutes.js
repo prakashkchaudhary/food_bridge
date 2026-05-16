@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get("/", getFoods);
 router.get("/:id", getFoodById);
-router.post("/add-public", addFood);
+// Removed public endpoint to prevent spam/abuse - use authenticated endpoint instead
 router.post("/add", protect, allowRoles("donor", "admin"), addFood);
 router.put("/update/:id", protect, allowRoles("donor", "admin"), updateFood);
 router.delete("/delete/:id", protect, allowRoles("admin"), deleteFood);

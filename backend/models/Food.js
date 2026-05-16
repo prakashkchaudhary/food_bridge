@@ -52,4 +52,10 @@ const foodSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Add indexes for better query performance
+foodSchema.index({ status: 1 });
+foodSchema.index({ donor: 1, status: 1 });
+foodSchema.index({ createdAt: -1 });
+foodSchema.index({ expiry: 1 });
+
 module.exports = mongoose.model("Food", foodSchema);

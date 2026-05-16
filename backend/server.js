@@ -2,6 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
 
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
@@ -13,7 +17,43 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 // Load .env only in development (Render injects env vars directly in production)
 dotenv.config();
 
+// Validate critical environment variables
+if (!process.env.JWT_SECRET) {
+  console.error("CRITICAL ERROR: JWT_SECRET is not defined in environment variables");
+  process.exit(1);
+}
+
+if (!process.env.MONGO_URI) {
+  console.error("CRITICAL ERROR: MONGO_URI is not defined in environment variables");
+  process.exit(1);
+}
+
 const app = express();
+
+// Security middleware
+app.use(helmet()); // Set security HTTP headers
+app.use(mongoSanitize()); // Prevent NoSQL injection
+app.use(xss()); // Prevent XSS attacks
+
+// Rate limiting to prevent brute force attacks
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply rate limiter to all routes
+app.use(limiter);
+
+// Stricter rate limiting for authentication routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login/register attempts per windowMs
+  message: "Too many authentication attempts, please try again later",
+  skipSuccessfulRequests: true,
+});
 
 // Use 'combined' log format in production for structured logs, 'dev' locally
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
@@ -44,7 +84,9 @@ app.use(
   })
 );
 
-app.use(express.json());
+// Body parser with size limits to prevent DoS attacks
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Root health check — required by Render and load balancers
 app.get("/", (req, res) => {
@@ -56,7 +98,7 @@ app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "FoodBridge API is running" });
 });
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/request", requestRoutes);
 app.use("/api/admin", adminRoutes);

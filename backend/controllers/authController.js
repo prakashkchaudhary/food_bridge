@@ -11,6 +11,27 @@ const register = async (req, res, next) => {
       throw new Error("name, email and password are required");
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      res.status(400);
+      throw new Error("Invalid email format");
+    }
+
+    // Strong password validation
+    if (password.length < 8) {
+      res.status(400);
+      throw new Error("Password must be at least 8 characters long");
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/;
+    if (!passwordRegex.test(password)) {
+      res.status(400);
+      throw new Error(
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)"
+      );
+    }
+
     const existing = await User.findOne({ email });
     if (existing) {
       res.status(409);
